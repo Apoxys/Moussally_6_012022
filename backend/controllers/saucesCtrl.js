@@ -1,4 +1,5 @@
 const sauce = require('../models/saucesModel');
+const fs = require('fs');
 
 // See all sauces and see one sauce
 exports.getAllSauces = (req, res, next) => {
@@ -16,9 +17,15 @@ exports.getOneSauce = (req, res, next) => {
 
 // Adding new sauce
 exports.createSauce = (req, res, next) => {
-    delete req.body._id;
+    const sauceObject = JSON.parse(req.body.sauce)
+    delete sauceObject._id;
     const newSauce = new sauce({
-        ...req.body
+        ...sauceObject,
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        likes: 0,
+        dislikes: 0,
+        usersLiked: [],
+        usersDisliked: []
     });
     newSauce.save()
         .then(() => res.status(201).json({ message: 'Sauce ajoutée au répertoire!' }))
@@ -27,7 +34,12 @@ exports.createSauce = (req, res, next) => {
 
 //modify user's sauce
 exports.modifyOneSauce = (req, res, next) => {
-    sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    const sauceObject = req.file ?
+        {
+            ...JSON.parse(req.body.sauce),
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        } : { ...req.body };
+    sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Sauce mise à jour' }))
         .catch(error => res.status(400).json({ error }));
 };
@@ -42,19 +54,26 @@ exports.deleteOneSauce = (req, res, next) => {
             if (sauce.userId !== req.auth.userId) {
                 return res.status(401).json({ error: new Error('Vous ne pouvez pas supprimer cette sauce') })
             }
-            sauce.deleteOne({ _id: req.params.id })
-                .then(() => res.status(200).json({ message: 'Sauce supprimée' }))
-                .catch(error => res.status(400).json({ error }));
+            const filename = sauce.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+                sauce.deleteOne({ _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Sauce supprimée' }))
+                    .catch(error => res.status(400).json({ error }));
+            })
+
         })
 };
 
 //likes and dislikes
 exports.likes = (req, res, next) => {
     sauce.findOne({ _id: req.params.id })
+
         .then((sauce) => {
             //mise à jour du status like ou dislike
+            console.log(req.body)
             if (req.body.like == 1) {
                 sauce.usersLiked.push(req.body.userId)
+                console.log(usersLiked.length)
             }
             if (req.body.like == -1) {
                 sauce.usersDisliked.push(req.body.userId)
