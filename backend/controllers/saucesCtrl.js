@@ -27,6 +27,7 @@ exports.createSauce = (req, res, next) => {
         usersLiked: [],
         usersDisliked: []
     });
+    console.log(newSauce)
     newSauce.save()
         .then(() => res.status(201).json({ message: 'Sauce ajoutée au répertoire!' }))
         .catch(error => res.status(400).json({ error }));
@@ -67,15 +68,17 @@ exports.deleteOneSauce = (req, res, next) => {
 //likes and dislikes
 exports.likes = (req, res, next) => {
     sauce.findOne({ _id: req.params.id })
-
-        .then((sauce) => {
+        .then(() => {
             //mise à jour du status like ou dislike
-            console.log(req.body)
-            if (req.body.like == 1) {
-                sauce.usersLiked.push(req.body.userId)
-                console.log(usersLiked.length)
+            // console.log(req.body)
+            if (req.body.like === 1) {
+                const likedarray = sauce.usersLiked
+                const thisUser = req.body.userId
+                // console.log('likedarray '+sauce.usersLiked)
+                likedarray.push(thisUser)
+                // console.log('thisuser '+usersLiked.length)   
             }
-            if (req.body.like == -1) {
+            if (req.body.like == -1) {  
                 sauce.usersDisliked.push(req.body.userId)
             }
             if (req.body.like == 0) {
@@ -96,7 +99,7 @@ exports.likes = (req, res, next) => {
 
             sauce.save()
                 .then((sauce) => res.status(200).json({ message: 'likes et dislikes mis à jour' }))
-                .catch(error => res.status(400).json({ error }));
+                .catch(() => res.status(400).json({ error: new Error }));
 
             res.status(200).json(usersLiked)
         })
