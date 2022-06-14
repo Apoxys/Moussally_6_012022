@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const saucesCtrl = require('../controllers/saucesCtrl');
 const auth = require('../middleware/auth');
+const saucesCtrl = require('../controllers/saucesCtrl');
+
 
 //global sauces sight
 router.get('/', auth, saucesCtrl.getAllSauces);
@@ -14,6 +15,6 @@ router.put('/:id', auth, saucesCtrl.modifyOneSauce);
 router.delete('/:id', auth, saucesCtrl.deleteOneSauce);
 
 //likes&dislikes
-router.post('/', auth)
+router.post('/', auth, saucesCtrl.likes);
 
 module.exports = router;

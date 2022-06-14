@@ -1,7 +1,6 @@
 const http = require('http');
 const app = require('./app');
 
-//This is from OpenClassRoom course
 /**
  * Normalize server's port's value 
  * @param {*} val 
@@ -22,7 +21,7 @@ const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
- * Error Handler throwing errors accordinlgy
+ * Error Handler 
  * @param {*} error 
  */
 const errorHandler = error => {
