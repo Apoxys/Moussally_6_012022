@@ -63,25 +63,21 @@ exports.deleteOneSauce = (req, res, next) => {
             })
 
         })
+        .catch(error => res.status(400).json({ error }))
 };
 
 //likes and dislikes
 exports.likes = (req, res, next) => {
     sauce.findOne({ _id: req.params.id })
-        .then(() => {
+        .then((sauce) => {
             //mise à jour du status like ou dislike
-            // console.log(req.body)
-            if (req.body.like === 1) {
-                const likedarray = sauce.usersLiked
-                const thisUser = req.body.userId
-                // console.log('likedarray '+sauce.usersLiked)
-                likedarray.push(thisUser)
-                // console.log('thisuser '+usersLiked.length)   
+            if (req.body.like == 1) {
+                sauce.usersLiked.push(req.body.userId)
             }
-            if (req.body.like == -1) {  
+            else if (req.body.like == -1) {
                 sauce.usersDisliked.push(req.body.userId)
             }
-            if (req.body.like == 0) {
+            else if (req.body.like == 0) {
                 if (sauce.usersLiked.includes(req.body.userId)) {
                     const thisUserIndex = sauce.usersLiked.indexOf(req.body.userId)
                     sauce.usersLiked.splice(thisUserIndex, 1)
@@ -91,17 +87,11 @@ exports.likes = (req, res, next) => {
                     sauce.usersDisliked.splice(thisUserIndex, 1)
                 }
             }
-
-            const currentLikes = usersLiked.length
-            sauce.likes = currentLikes
-            const currentDislikes = usersDisliked.length
-            sauce.dislikes = currentDislikes
-
+            sauce.likes = sauce.usersLiked.length
+            sauce.dislikes = sauce.usersDisliked.length
             sauce.save()
                 .then((sauce) => res.status(200).json({ message: 'likes et dislikes mis à jour' }))
                 .catch(() => res.status(400).json({ error: new Error }));
-
-            res.status(200).json(usersLiked)
         })
         .catch(error => res.status(400).json({ error }));
 };
