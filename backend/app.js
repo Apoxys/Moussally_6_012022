@@ -1,10 +1,16 @@
+require('dotenv').config()
 const express = require('express');
+
+const helmet = require('helmet');
+
 const mongoose = require('mongoose');
+
 const saucesRoutes = require('./routes/saucesRoutes');
 const userRoutes = require('./routes/userRoutes');
+
 const path = require('path');
 
-mongoose.connect('mongodb+srv://MoussallyP:trztsKZruTq9e7u@cluster0.1lz92lt.mongodb.net/test?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.SERVER_USERNAME}:${process.env.SERVER_PWD}@cluster0.1lz92lt.mongodb.net/test?retryWrites=true&w=majority`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -13,6 +19,8 @@ mongoose.connect('mongodb+srv://MoussallyP:trztsKZruTq9e7u@cluster0.1lz92lt.mong
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
+
+app.use(helmet());
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

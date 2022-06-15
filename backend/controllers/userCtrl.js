@@ -28,14 +28,14 @@ exports.login = (req, res, next) => {
                     if (!valid) {
                         return res.status(401).json({ message: 'wrong password!' })
                     }
-                    res.status(200).json({ 
+                    res.status(200).json({
                         userId: user._id,
                         token: jwt.sign(
                             { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
+                            process.env.SECRET_TOKEN,
                             { expiresIn: '24h' }
                         )
-                     });
+                    });
                 })
                 .catch(error => res.status(501).json({ error }));
         })
