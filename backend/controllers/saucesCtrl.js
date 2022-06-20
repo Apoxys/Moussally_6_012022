@@ -27,7 +27,6 @@ exports.createSauce = (req, res, next) => {
         usersLiked: [],
         usersDisliked: []
     });
-    console.log(newSauce)
     newSauce.save()
         .then(() => res.status(201).json({ message: 'Sauce ajoutée au répertoire!' }))
         .catch(error => res.status(400).json({ error }));

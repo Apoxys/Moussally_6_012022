@@ -17,7 +17,6 @@ module.exports = (req, res, next) => {
         next();
     }
     else {
-        window.alert("Votre Mot de passe ne respecte pas les critères suivants :" + passwordSchema.validate(req.body.password, { list: true }))
         res.status(400).json({ error: "password failed those specifics : " + passwordSchema.validate(req.body.password, { list: true }) })
     }
 }
